@@ -72,6 +72,46 @@ public class StatisticalReducer {
         }
     }
 
+    /* Reducing is done by taking the std deviation of the star rating values */
+    public static class StdDevReducer
+            extends Reducer<Text, DoubleWritable,Text,DoubleWritable> {
+
+        private DoubleWritable result = new DoubleWritable();
+
+        public void reduce(Text key, Iterable<DoubleWritable> values,
+                           Context context
+        ) throws IOException, InterruptedException {
+            Iterator itr = values.iterator();
+            double max = ((DoubleWritable) itr.next()).get();
+            for (DoubleWritable val : values) {
+                if (val.get() > max)
+                    max = val.get();
+            }
+            result.set(max);
+            context.write(key, result);
+        }
+    }
+
+    /* Reducing is done by taking the mode of the star rating values */
+    public static class ModeReducer
+            extends Reducer<Text, DoubleWritable,Text,DoubleWritable> {
+
+        private DoubleWritable result = new DoubleWritable();
+
+        public void reduce(Text key, Iterable<DoubleWritable> values,
+                           Context context
+        ) throws IOException, InterruptedException {
+            Iterator itr = values.iterator();
+            double max = ((DoubleWritable) itr.next()).get();
+            for (DoubleWritable val : values) {
+                if (val.get() > max)
+                    max = val.get();
+            }
+            result.set(max);
+            context.write(key, result);
+        }
+    }
+
 
 }
 

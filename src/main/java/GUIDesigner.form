@@ -34,6 +34,8 @@
                 <item value="Minimum"/>
                 <item value="Maximum"/>
                 <item value="Mean"/>
+                <item value="Std Dev"/>
+                <item value="Mode"/>
               </model>
             </properties>
           </component>

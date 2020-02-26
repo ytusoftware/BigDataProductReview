@@ -34,39 +34,56 @@ public class MROperations {
         this.statisticalReducer = statisticalReducer;
     }
 
+    /* Creates configuration for MapReduce job */
+    private void createConfig() {
+        conf = new Configuration();
+        conf.set("fs.defaultFS", "hdfs://172.20.10.10:9000");
+        conf.set("mapreduce.jobtracker.address", "172.20.10.10:54311");
+        //conf.set("mapreduce.map.class", "RatingMapper");
+        //conf.set("mapreduce.reduce.class", "StatisticalReducer.MeanReducer");
+    }
+
+    /* Creating a new job based on the configuration */
+    private Job createJob() throws IOException {
+        /* Creating a new job based on the configuration */
+        Job job = Job.getInstance(conf, "Product Review Analysis");
+        job.setJarByClass(RatingMapper.class);
+        job.setMapperClass(RatingMapper.class);
+        job.setReducerClass(statisticalReducer);
+
+
+        /* key/value of your reducer output */
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(DoubleWritable.class);
+        job.setOutputFormatClass(SequenceFileOutputFormat.class);
+
+        return job;
+    }
+
     /* This methods runs the Hadoop job on top of the HDFS with specified statistic function for Combiner & Reducer */
     public boolean runHadoopJob(){
         try{
             System.out.println("Starting to run the code on Hadoop...");
-            String[] argsTemp = { "hdfs://localhost:9000/customerReview/input", "hdfs://localhost:9000/customerReview/output" };
+            String[] argsTemp = { "hdfs://172.20.10.10:9000/customerReview/input", "hdfs://172.20.10.10:9000/customerReview/output" };
+            Job job;
 
-            /* create a configuration */
-            conf = new Configuration();
-            conf.set("fs.default.name", "hdfs://localhost:9000");
-            conf.set("mapred.job.tracker", "localhost:9010");
-            //conf.set("mapreduce.map.class", "RatingMapper");
-            //conf.set("mapreduce.reduce.class", "StatisticalReducer.MeanReducer");
+            /* Creating a configuration */
+            createConfig();
 
-            /* create a new job based on the configuration */
-            Job job = Job.getInstance(conf, "Product Review Analysis");
-            job.setJarByClass(RatingMapper.class);
-            job.setMapperClass(RatingMapper.class);
-            job.setReducerClass(statisticalReducer);
-
-
-            /* key/value of your reducer output */
-            job.setOutputKeyClass(Text.class);
-            job.setOutputValueClass(DoubleWritable.class);
-            job.setOutputFormatClass(SequenceFileOutputFormat.class);
+            /* Creating a job based on the configuration */
+            job = createJob();
 
             FileInputFormat.addInputPath(job, new Path(argsTemp[0]));
-            /* this deletes possible output paths to prevent job failures */
+
+            /* This deletes possible output paths to prevent job failures */
             fs = FileSystem.get(conf);
             Path out = new Path(argsTemp[1]);
             fs.delete(out, true);
-            /* finally set the empty out path */
+
+            /* Finally set the empty out path */
             FileOutputFormat.setOutputPath(job, new Path(argsTemp[1]));
 
+            /* Running the job */
             job.submit();
             job.waitForCompletion(true);
 
@@ -86,14 +103,18 @@ public class MROperations {
 
         HashMap<String,Double> jobResults = new HashMap<String, Double>();
 
-        FileStatus[] fss = fs.listStatus(new Path("hdfs://localhost:9000/customerReview/output"));
+        FileStatus[] fss = fs.listStatus(new Path("hdfs://172.20.10.10:9000/customerReview/output"));
         for (FileStatus status : fss) {
             Path path = status.getPath();
             System.out.println(path.getName());
+
+            /* Reading only the reducer output files */
             if (path.getName().compareTo("_SUCCESS") != 0) {
                 SequenceFile.Reader reader = new SequenceFile.Reader(conf, SequenceFile.Reader.file(path));
                 Text key = new Text();
                 DoubleWritable value = new DoubleWritable();
+
+                /* Iterating through key-value pairs */
                 while (reader.next(key, value)) {
                     //System.out.println(key.toString() + " | " + value.get());
                     jobResults.put(key.toString(),value.get());
@@ -106,6 +127,5 @@ public class MROperations {
 
         return jobResults;
     }
-
 
 }

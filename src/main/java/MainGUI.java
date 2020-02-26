@@ -18,12 +18,13 @@ public class MainGUI extends JFrame {
     private JLabel testLabel;
     private DefaultTableModel dtm;
     private TableRowSorter<DefaultTableModel> trs;
+    private HashMap<String,Integer> productNameRowIndex;        /* This hash map holds table row index for each product name */
 
     public MainGUI() {
         /* Adding the root panel */
         this.add(rootPanel);
         this.setTitle("Amazon Product Review Analysis");
-        this.setSize(400, 500);
+        this.setSize(550, 500);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 
@@ -45,15 +46,23 @@ public class MainGUI extends JFrame {
                     case 2:
                         mrOp.setStatisticalReducer(StatisticalReducer.MeanReducer.class);
                         break;
+                    /* Std Dev Reducer */
+                    case 3:
+                        mrOp.setStatisticalReducer(StatisticalReducer.StdDevReducer.class);
+                        break;
+                    /* Mode Reducer */
+                    case 4:
+                        mrOp.setStatisticalReducer(StatisticalReducer.ModeReducer.class);
+                        break;
+
                     default:
                         // code block
                 }
 
-                /* Before inserting results, clearing the table */
-                dtm.setRowCount(0);
 
                 /* Running the user's desired statistical function */
                 mrOp.runHadoopJob();
+
                 try {
                     jobResults = mrOp.getResults();
                 } catch (IOException ex) {
@@ -79,7 +88,11 @@ public class MainGUI extends JFrame {
         /* Creating model for table */
         dtm = new DefaultTableModel();
         dtm.addColumn("Product Name");
-        dtm.addColumn("Result");
+        dtm.addColumn("Min");
+        dtm.addColumn("Max");
+        dtm.addColumn("Mean");
+        dtm.addColumn("Std Dev");
+        dtm.addColumn("Mode");
 
         /* Creating row sorter for table */
         trs = new TableRowSorter<DefaultTableModel>(dtm);
@@ -92,9 +105,24 @@ public class MainGUI extends JFrame {
 
     /* Inserts MapReduce job results to the JTable component */
     private void insertResultsToTable(HashMap<String,Double> jobResults) {
+        int currRowIndex = 0;
 
+        /* If there are no rows, adding the rows first. And also creating the product name row index map */
+        if (dtm.getRowCount() != jobResults.keySet().size()) {
+            productNameRowIndex = new HashMap<String, Integer>();
+
+            for (String productName : jobResults.keySet()) {
+                dtm.addRow(new Object[]{productName,"","","","","" });
+                productNameRowIndex.put(productName,currRowIndex);
+                currRowIndex++;
+            }
+        }
+
+
+        /* Setting the selected reducer's results in the table */
         for(String productName : jobResults.keySet()) {
-            dtm.addRow(new Object[]{productName, jobResults.get(productName)});
+            currRowIndex = productNameRowIndex.get(productName);
+            dtm.setValueAt(jobResults.get(productName),currRowIndex,comboBox1.getSelectedIndex()+1);
         }
 
     }
