@@ -7,8 +7,13 @@
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+
+import javax.swing.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.lang.Math;
+import java.util.List;
 
 public class StatisticalReducer {
 
@@ -21,12 +26,15 @@ public class StatisticalReducer {
         public void reduce(Text key, Iterable<DoubleWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
-            double sum = 0.0;
-            int count = 0;
-            for (DoubleWritable val : values) {
-                sum += val.get();
-                count++;
-            }
+            List<Double> valuesAsList;
+
+            valuesAsList = convertIteratorToList(values);
+
+            ArrayList<Double> sumAndCount =  StatisticalReducer.calculateSumAndCount(valuesAsList);
+
+            double sum = sumAndCount.get(0);
+            double count = sumAndCount.get(1);
+
             result.set(sum/count);
             context.write(key, result);
         }
@@ -81,13 +89,40 @@ public class StatisticalReducer {
         public void reduce(Text key, Iterable<DoubleWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
-            Iterator itr = values.iterator();
-            double max = ((DoubleWritable) itr.next()).get();
-            for (DoubleWritable val : values) {
-                if (val.get() > max)
-                    max = val.get();
+
+            ArrayList<Double> sumAndCount;
+            List<Double> valuesAsList;
+            double mean;
+            double count;
+            double sumSquaredDiff;      /* Holds sum of the squared differences */
+            double stdDev;              /* The std dev */
+
+
+            /* Getting values to a list from the iterator */
+            valuesAsList = convertIteratorToList(values);
+
+
+            /* Calculating sum and count of the key-val pairs */
+            sumAndCount = StatisticalReducer.calculateSumAndCount(valuesAsList);
+            count = sumAndCount.get(1);
+            mean = sumAndCount.get(0)/count;
+            sumSquaredDiff = 0.0;
+            stdDev = 0.0;
+
+
+            /* Calculating sum of the squared differences */
+            for (int i=0;i<valuesAsList.size();i++) {
+                System.out.println(valuesAsList.get(i));
+                sumSquaredDiff += Math.pow(valuesAsList.get(i) - mean, 2);
             }
-            result.set(max);
+
+
+            /* Calculating standard deviation */
+            if (count != 1) {
+                stdDev = Math.sqrt(sumSquaredDiff/(count-1));
+            }
+
+            result.set(stdDev);
             context.write(key, result);
         }
     }
@@ -110,6 +145,39 @@ public class StatisticalReducer {
             result.set(max);
             context.write(key, result);
         }
+    }
+
+    /* this method returns sum and number of elements in the given iterable */
+    private static ArrayList<Double> calculateSumAndCount(List<Double> values) {
+        ArrayList<Double> sumAndCount = new ArrayList<Double>();        /* Sum is stored in first index, count is in second index */
+        double sum = 0.0;
+        double count = 0.0;
+
+
+        for (int i=0;i<values.size();i++) {
+            sum += values.get(i);
+            count = count + 1.0;
+        }
+        sumAndCount.add(sum);
+        sumAndCount.add(count);
+
+        return sumAndCount;
+
+    }
+
+    /* This method converts given iterator set to a list */
+    private static List<Double> convertIteratorToList(Iterable<DoubleWritable> values) {
+
+        List<Double> valuesAsList;
+
+        valuesAsList = new ArrayList<Double>();
+
+        while (values.iterator().hasNext()) {
+            valuesAsList.add(values.iterator().next().get());
+        }
+
+        return valuesAsList;
+
     }
 
 
