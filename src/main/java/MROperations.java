@@ -18,15 +18,18 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+
 import org.apache.hadoop.io.SequenceFile.Reader.Option;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
 
 public class MROperations {
 
-    private Class<? extends Reducer> statisticalReducer;         /* Statistical reducer class that is used in Reduce and Combine workers */
-    FileSystem fs;                                               /* Used for HDFS i/o */
-    Configuration conf;                                          /* Used for Hadoop worker configuration */
+    private Class<? extends Reducer> statisticalReducer;                    /* Statistical reducer class that is used in Reduce and Combine workers */
+    FileSystem fs;                                                          /* Used for HDFS i/o */
+    Configuration conf;                                                     /* Used for Hadoop worker configuration */
+    public static HashSet<String> productCategories = new HashSet<>();      /* This hashset holds the detected product categories while mapping is done (see RatingMapper class) */
 
 
     /* Sets the statistical reducer class according to given parameter */

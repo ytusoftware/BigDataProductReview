@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class MainGUI extends JFrame {
     private JPanel rootPanel;
@@ -15,6 +16,8 @@ public class MainGUI extends JFrame {
     private JTable table1;
     private JTextField searchProduct;
     private JButton searchButton;
+    private JComboBox guiCategories;
+    private JButton filterButton;
     private JLabel testLabel;
     private DefaultTableModel dtm;
     private TableRowSorter<DefaultTableModel> trs;
@@ -81,7 +84,22 @@ public class MainGUI extends JFrame {
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                productNameFilter(searchProduct);
+                productNameFilter(searchProduct.getText());
+            }
+        });
+        filterButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String pattern;
+
+                pattern = "";
+
+                if (guiCategories.getSelectedIndex() > 0) {
+                    pattern = guiCategories.getItemAt(guiCategories.getSelectedIndex()).toString();
+                    pattern += " \\| ";
+                    System.out.println(pattern);
+                }
+                productCategoryFilter(pattern);
             }
         });
     }
@@ -108,22 +126,37 @@ public class MainGUI extends JFrame {
 
     }
 
-    /* Inserts MapReduce job results to the JTable component */
-    private void insertResultsToTable(HashMap<String,Double> jobResults) {
+    /* Initialized the MapReduce result table when results are displayed for the first time */
+    private void initResultTable(HashMap<String,Double> jobResults) {
         int currRowIndex = 0;
+        Iterator iter = MROperations.productCategories.iterator();
 
         /* If there are no rows, adding the rows first. And also creating the product name row index map */
         if (dtm.getRowCount() != jobResults.keySet().size()) {
             productNameRowIndex = new HashMap<String, Integer>();
 
+            /* Adding empty rows */
             for (String productName : jobResults.keySet()) {
                 dtm.addRow(new Object[]{productName,"","","","","","" });
                 productNameRowIndex.put(productName,currRowIndex);
                 currRowIndex++;
             }
 
+            /* Adding product categories to the combobox */
+            while (iter.hasNext()) {
+                guiCategories.addItem(iter.next().toString());
+            }
+
+            /* Displaying the info msg */
             JOptionPane.showMessageDialog(this.rootPanel,"A total of "+jobResults.keySet().size()+" products were detected and analyzed.");
         }
+    }
+
+    /* Inserts MapReduce job results to the JTable component */
+    private void insertResultsToTable(HashMap<String,Double> jobResults) {
+        int currRowIndex = 0;
+
+        initResultTable(jobResults);
 
 
         /* Setting the selected reducer's results in the table */
@@ -132,15 +165,31 @@ public class MainGUI extends JFrame {
             dtm.setValueAt(jobResults.get(productName),currRowIndex,comboBox1.getSelectedIndex()+1);
         }
 
+        /* Clearing the product category hashset */
+        MROperations.productCategories.clear();
+
     }
 
     /* For search box filtering by product name */
-    private void productNameFilter(JTextField initial_box) {
+    private void productNameFilter(String initialPattern) {
         RowFilter<DefaultTableModel, Object> rf = null;
-        System.out.println(initial_box.getText());
         //If current expression doesn't parse, don't update.
         try {
-            rf = RowFilter.regexFilter(initial_box.getText(), 0);
+            rf = RowFilter.regexFilter(initialPattern, 0);
+        } catch (java.util.regex.PatternSyntaxException e) {
+            System.err.println("parse error");
+            return;
+        }
+        trs.setRowFilter(rf);
+
+    }
+
+    /* For product category filtering */
+    private void productCategoryFilter(String initialPattern) {
+        RowFilter<DefaultTableModel, Object> rf = null;
+        //If current expression doesn't parse, don't update.
+        try {
+            rf = RowFilter.regexFilter("^"+initialPattern+"*", 0);
         } catch (java.util.regex.PatternSyntaxException e) {
             System.err.println("parse error");
             return;
