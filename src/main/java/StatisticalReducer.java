@@ -5,6 +5,7 @@
  */
 
 import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
@@ -28,8 +29,10 @@ public class StatisticalReducer {
         ) throws IOException, InterruptedException {
             List<Double> valuesAsList;
 
+            /* Converting iterator to list */
             valuesAsList = convertIteratorToList(values);
 
+            /* Calculating sum and count of the star rating values for the current key */
             ArrayList<Double> sumAndCount =  StatisticalReducer.calculateSumAndCount(valuesAsList);
 
             double sum = sumAndCount.get(0);
@@ -136,13 +139,41 @@ public class StatisticalReducer {
         public void reduce(Text key, Iterable<DoubleWritable> values,
                            Context context
         ) throws IOException, InterruptedException {
-            Iterator itr = values.iterator();
-            double max = ((DoubleWritable) itr.next()).get();
+
+            int[] frequencyArray = {0,0,0,0,0};     /* Holds the frequency of each star rating value (1 to 5) */
+            int maxFreqIndex;
+
+            /* Calculating frequency of each star rating value */
             for (DoubleWritable val : values) {
-                if (val.get() > max)
-                    max = val.get();
+                frequencyArray[((int)val.get())-1]++;
             }
-            result.set(max);
+
+            maxFreqIndex = 0;
+
+            /* Finding maximum of the frequencies */
+            for(int i=1;i<5;i++) {
+                if (frequencyArray[i] > frequencyArray[maxFreqIndex]) {
+                    maxFreqIndex = i;
+                }
+            }
+            result.set(maxFreqIndex+1);
+            context.write(key, result);
+        }
+    }
+
+    /* Reducing is done by counting the total number of votes for a given product name */
+    public static class CountReducer
+            extends Reducer<Text, DoubleWritable,Text, DoubleWritable> {
+
+        private DoubleWritable result = new DoubleWritable();
+
+        public void reduce(Text key, Iterable<DoubleWritable> values,
+                           Context context
+        ) throws IOException, InterruptedException {
+            int numVotes;
+
+            numVotes = StatisticalReducer.convertIteratorToList(values).size();
+            result.set(numVotes);
             context.write(key, result);
         }
     }

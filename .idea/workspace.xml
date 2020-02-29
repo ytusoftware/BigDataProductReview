@@ -3,15 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="eb3747b5-49b0-464c-a31b-d438febd48cd" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/GUIDesigner.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/GUIDesigner.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/MainGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/MainGUI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/StatisticalReducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/StatisticalReducer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/HDFSOperations.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/HDFSOperations.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MROperations.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MROperations.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/MainGUI$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainGUI$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/MainGUI$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainGUI$2.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/MainGUI.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainGUI.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MainProgram.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainProgram.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/RatingMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/RatingMapper.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/StatisticalReducer$MaxReducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/StatisticalReducer$MaxReducer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/StatisticalReducer$MeanReducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/StatisticalReducer$MeanReducer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/StatisticalReducer$MinReducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/StatisticalReducer$MinReducer.class" afterDir="false" />
@@ -100,34 +97,34 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="533" y="173" key="#com.intellij.ide.util.MemberChooser/0.0.1440.900@0.0.1440.900" timestamp="1582625255330" />
-    <state width="1398" height="190" key="GridCell.Tab.0.bottom" timestamp="1582838617092">
+    <state width="1398" height="190" key="GridCell.Tab.0.bottom" timestamp="1582992020345">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="190" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1582838617092" />
-    <state width="1398" height="72" key="GridCell.Tab.0.bottom/0.23.1440.797@0.23.1440.797" timestamp="1582622574673" />
-    <state width="1398" height="190" key="GridCell.Tab.0.center" timestamp="1582838617091">
+    <state width="1398" height="190" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1582992020345" />
+    <state width="1398" height="190" key="GridCell.Tab.0.bottom/0.23.1440.797@0.23.1440.797" timestamp="1582991257927" />
+    <state width="1398" height="190" key="GridCell.Tab.0.center" timestamp="1582992020343">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="190" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1582838617091" />
-    <state width="1398" height="72" key="GridCell.Tab.0.center/0.23.1440.797@0.23.1440.797" timestamp="1582622574672" />
-    <state width="1398" height="190" key="GridCell.Tab.0.left" timestamp="1582838617090">
+    <state width="1398" height="190" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1582992020343" />
+    <state width="1398" height="190" key="GridCell.Tab.0.center/0.23.1440.797@0.23.1440.797" timestamp="1582991257925" />
+    <state width="1398" height="190" key="GridCell.Tab.0.left" timestamp="1582992020343">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="190" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1582838617090" />
-    <state width="1398" height="72" key="GridCell.Tab.0.left/0.23.1440.797@0.23.1440.797" timestamp="1582622574671" />
-    <state width="1398" height="190" key="GridCell.Tab.0.right" timestamp="1582838617091">
+    <state width="1398" height="190" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1582992020343" />
+    <state width="1398" height="190" key="GridCell.Tab.0.left/0.23.1440.797@0.23.1440.797" timestamp="1582991257925" />
+    <state width="1398" height="190" key="GridCell.Tab.0.right" timestamp="1582992020344">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1398" height="190" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1582838617091" />
-    <state width="1398" height="72" key="GridCell.Tab.0.right/0.23.1440.797@0.23.1440.797" timestamp="1582622574672" />
+    <state width="1398" height="190" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1582992020344" />
+    <state width="1398" height="190" key="GridCell.Tab.0.right/0.23.1440.797@0.23.1440.797" timestamp="1582991257926" />
     <state x="388" y="172" key="GuiDesigner.FormSource.Dialog" timestamp="1582411903833">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="388" y="172" key="GuiDesigner.FormSource.Dialog/0.0.1440.900@0.0.1440.900" timestamp="1582411903833" />
-    <state x="585" y="251" key="UIDesigner.ListEditorDialog" timestamp="1582729066683">
+    <state x="585" y="251" key="UIDesigner.ListEditorDialog" timestamp="1582989853542">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="585" y="251" key="UIDesigner.ListEditorDialog/0.0.1440.900@0.0.1440.900" timestamp="1582729066683" />
+    <state x="585" y="251" key="UIDesigner.ListEditorDialog/0.0.1440.900@0.0.1440.900" timestamp="1582989853542" />
     <state x="100" y="100" width="1240" height="700" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1582411988074">
       <screen x="0" y="23" width="1440" height="797" />
     </state>

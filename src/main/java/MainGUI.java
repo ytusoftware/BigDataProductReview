@@ -54,6 +54,10 @@ public class MainGUI extends JFrame {
                     case 4:
                         mrOp.setStatisticalReducer(StatisticalReducer.ModeReducer.class);
                         break;
+                    /* Count Reducer */
+                    case 5:
+                        mrOp.setStatisticalReducer(StatisticalReducer.CountReducer.class);
+                        break;
 
                     default:
                         // code block
@@ -93,6 +97,7 @@ public class MainGUI extends JFrame {
         dtm.addColumn("Mean");
         dtm.addColumn("Std Dev");
         dtm.addColumn("Mode");
+        dtm.addColumn("Count");
 
         /* Creating row sorter for table */
         trs = new TableRowSorter<DefaultTableModel>(dtm);
@@ -112,10 +117,12 @@ public class MainGUI extends JFrame {
             productNameRowIndex = new HashMap<String, Integer>();
 
             for (String productName : jobResults.keySet()) {
-                dtm.addRow(new Object[]{productName,"","","","","" });
+                dtm.addRow(new Object[]{productName,"","","","","","" });
                 productNameRowIndex.put(productName,currRowIndex);
                 currRowIndex++;
             }
+
+            JOptionPane.showMessageDialog(this.rootPanel,"A total of "+jobResults.keySet().size()+" products were detected and analyzed.");
         }
 
 
