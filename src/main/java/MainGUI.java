@@ -66,9 +66,15 @@ public class MainGUI extends JFrame {
                         // code block
                 }
 
+                long startTime = System.nanoTime();
 
                 /* Running the user's desired statistical function */
                 mrOp.runHadoopJob();
+
+                long elapsedTime = System.nanoTime() - startTime;
+
+                System.out.println("Total execution time in seconds: "+ elapsedTime/1000000000);
+
 
                 try {
                     jobResults = mrOp.getResults();
