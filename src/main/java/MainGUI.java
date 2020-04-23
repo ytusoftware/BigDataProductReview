@@ -1,3 +1,6 @@
+import org.apache.commons.io.FileUtils;
+import org.apache.hadoop.fs.FileStatus;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -18,8 +21,17 @@ public class MainGUI extends JFrame {
     private JButton searchButton;
     private JComboBox guiCategories;
     private JButton filterButton;
+    private JTabbedPane tabbedPane1;
+    private JPanel HDFSSec;
+    private JPanel MapReduceSec;
+    private JTable table2;
+    private JButton listHDFSContentButton;
+    private JButton deleteSelectedFileButton;
+    private JButton downloadSelectedFileButton;
+    private JButton addNewFileButton;
     private JLabel testLabel;
-    private DefaultTableModel dtm;
+    private DefaultTableModel dtmMapReduce;
+    private DefaultTableModel dtmHDFS;
     private TableRowSorter<DefaultTableModel> trs;
     private HashMap<String,Integer> productNameRowIndex;        /* This hash map holds table row index for each product name */
 
@@ -27,7 +39,7 @@ public class MainGUI extends JFrame {
         /* Adding the root panel */
         this.add(rootPanel);
         this.setTitle("Amazon Product Review Analysis");
-        this.setSize(550, 500);
+        this.setSize(750, 500);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 
@@ -108,27 +120,65 @@ public class MainGUI extends JFrame {
                 productCategoryFilter(pattern);
             }
         });
+        listHDFSContentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                HDFSOperations hdfsOp;
+                FileStatus[] files;
+                int numOfDigits;
+
+                hdfsOp = new HDFSOperations();
+
+                try {
+                    /* Getting the status of the files in dataset directory */
+                    files = hdfsOp.getHDFSContent();
+
+                    dtmHDFS.setRowCount(0);
+
+                    /* Adding the files as the rows of the HDFS jTable */
+                    for(FileStatus file:files) {
+
+                        dtmHDFS.addRow(new Object[]{file.getPath().getName(),FileUtils.byteCountToDisplaySize(file.getLen()) , file.getReplication(), FileUtils.byteCountToDisplaySize(file.getBlockSize())});
+                    }
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
+            }
+        });
     }
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
 
-        /* Creating model for table */
-        dtm = new DefaultTableModel();
-        dtm.addColumn("Product Name");
-        dtm.addColumn("Min");
-        dtm.addColumn("Max");
-        dtm.addColumn("Mean");
-        dtm.addColumn("Std Dev");
-        dtm.addColumn("Mode");
-        dtm.addColumn("Count");
+        /* Creating model for MapReduce Result Table */
+        dtmMapReduce = new DefaultTableModel();
+        dtmMapReduce.addColumn("Product Name");
+        dtmMapReduce.addColumn("Min");
+        dtmMapReduce.addColumn("Max");
+        dtmMapReduce.addColumn("Mean");
+        dtmMapReduce.addColumn("Std Dev");
+        dtmMapReduce.addColumn("Mode");
+        dtmMapReduce.addColumn("Count");
+
+        /* Creating model for HDFS Table */
+        dtmHDFS = new DefaultTableModel();
+        dtmHDFS.addColumn("Name");
+        dtmHDFS.addColumn("Size");
+        dtmHDFS.addColumn("Replication");
+        dtmHDFS.addColumn("Block Size");
 
         /* Creating row sorter for table */
-        trs = new TableRowSorter<DefaultTableModel>(dtm);
+        trs = new TableRowSorter<DefaultTableModel>(dtmMapReduce);
 
-        table1 = new JTable(dtm);
+        table1 = new JTable(dtmMapReduce);
         table1.setRowSorter(trs);
-        table1.setModel(dtm);
+        table1.setModel(dtmMapReduce);
+
+        table2 = new JTable(dtmHDFS);
+        table2.setModel(dtmHDFS);
 
     }
 
@@ -138,12 +188,12 @@ public class MainGUI extends JFrame {
         Iterator iter = MROperations.productCategories.iterator();
 
         /* If there are no rows, adding the rows first. And also creating the product name row index map */
-        if (dtm.getRowCount() != jobResults.keySet().size()) {
+        if (dtmMapReduce.getRowCount() != jobResults.keySet().size()) {
             productNameRowIndex = new HashMap<String, Integer>();
 
             /* Adding empty rows */
             for (String productName : jobResults.keySet()) {
-                dtm.addRow(new Object[]{productName,"","","","","","" });
+                dtmMapReduce.addRow(new Object[]{productName,"","","","","","" });
                 productNameRowIndex.put(productName,currRowIndex);
                 currRowIndex++;
             }
@@ -168,7 +218,7 @@ public class MainGUI extends JFrame {
         /* Setting the selected reducer's results in the table */
         for(String productName : jobResults.keySet()) {
             currRowIndex = productNameRowIndex.get(productName);
-            dtm.setValueAt(jobResults.get(productName),currRowIndex,comboBox1.getSelectedIndex()+1);
+            dtmMapReduce.setValueAt(jobResults.get(productName),currRowIndex,comboBox1.getSelectedIndex()+1);
         }
 
         /* Clearing the product category hashset */
