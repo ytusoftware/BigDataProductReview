@@ -34,7 +34,8 @@ public class MainGUI extends JFrame {
     private DefaultTableModel dtmHDFS;
     private TableRowSorter<DefaultTableModel> trs;
     private HashMap<String,Integer> productNameRowIndex;        /* This hash map holds table row index for each product name */
-
+    private FileStatus[] files;                                 /* Array that holds the information of the files in the HDFS table. */
+    private HDFSOperations hdfsOp;                              /* The class in which the operations on the file system are executed. */
     public MainGUI() {
         /* Adding the root panel */
         this.add(rootPanel);
@@ -42,6 +43,15 @@ public class MainGUI extends JFrame {
         this.setSize(750, 500);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        /* The file system is initializing. */
+        hdfsOp = new HDFSOperations();
+        try {
+            /* Files in the file system are listed. */
+            listFileStatus();
+        }
+        catch (IOException ex){
+            ex.printStackTrace();
+        }
 
         button1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -124,25 +134,89 @@ public class MainGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                HDFSOperations hdfsOp;
-                FileStatus[] files;
-                int numOfDigits;
-
-                hdfsOp = new HDFSOperations();
-
                 try {
-                    /* Getting the status of the files in dataset directory */
-                    files = hdfsOp.getHDFSContent();
-
-                    dtmHDFS.setRowCount(0);
-
-                    /* Adding the files as the rows of the HDFS jTable */
-                    for(FileStatus file:files) {
-
-                        dtmHDFS.addRow(new Object[]{file.getPath().getName(),FileUtils.byteCountToDisplaySize(file.getLen()) , file.getReplication(), FileUtils.byteCountToDisplaySize(file.getBlockSize())});
-                    }
+                    /* Files in the file system are listed. */
+                    listFileStatus();
 
                 } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
+            }
+        });
+        deleteSelectedFileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                FileStatus file;
+                int row;
+
+                /* It is determined which line is selected. */
+                row = table2.getSelectedRow();
+
+                if ( row >= 0 ) {
+                    file = files[row];
+
+                    try{
+                        /* The selected file is deleted from the file system. */
+                        hdfsOp.deleteFile(file.getPath());
+                        /* Current files are listed in the file system. */
+                        listFileStatus();
+                    }
+                    catch (IOException ex){
+                        ex.printStackTrace();
+                    }
+
+                }
+                else {
+                    /* If no file is selected, the user is informed with a warning message. */
+                    JOptionPane.showMessageDialog(table2,"Please select the file to delete.","Warning",JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+        downloadSelectedFileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                FileStatus file;
+                int row;
+
+                /* It is determined which line is selected. */
+                row = table2.getSelectedRow();
+
+                if ( row >= 0 && files[row].isFile()){
+
+                    file = files[row];
+
+                    try{
+                        /* The selected file is download from the file system. */
+                        hdfsOp.downloadFile(file.getPath());
+                        /* Current files are listed in the file system. */
+                        listFileStatus();
+                    }
+                    catch (IOException ex){
+                        ex.printStackTrace();
+                    }
+
+                }
+                else{
+                    /* If no file is selected, the user is informed with a warning message. */
+                    JOptionPane.showMessageDialog(table2,"Please select the file to download.","Warning",JOptionPane.WARNING_MESSAGE);
+                }
+
+            }
+        });
+        addNewFileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try{
+                    /* The file on the user's computer is uploaded to the file system. */
+                    hdfsOp.uploadFile();
+                    /* Current files are listed in the file system. */
+                    listFileStatus();
+                }
+                catch (IOException ex){
                     ex.printStackTrace();
                 }
 
@@ -252,6 +326,20 @@ public class MainGUI extends JFrame {
         }
         trs.setRowFilter(rf);
 
+    }
+
+    private void listFileStatus() throws IOException{
+
+        /* Getting the status of the files in dataset directory */
+        files = hdfsOp.getHDFSContent();
+
+        dtmHDFS.setRowCount(0);
+
+        /* Adding the files as the rows of the HDFS jTable */
+        for(FileStatus file:files) {
+
+            dtmHDFS.addRow(new Object[]{file.getPath().getName(),FileUtils.byteCountToDisplaySize(file.getLen()) , file.getReplication(), FileUtils.byteCountToDisplaySize(file.getBlockSize())});
+        }
     }
 
 }
