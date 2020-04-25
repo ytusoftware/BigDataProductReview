@@ -12,6 +12,7 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobStatus;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -88,13 +89,8 @@ public class MROperations implements Runnable {
             /* Running the job */
             job.submit();
 
-            while (!job.isComplete()) {
-                MainProgram.guiForm.setMapperProgress(job.getStatus().getMapProgress());
-                MainProgram.guiForm.setReducerProgress(job.getStatus().getReduceProgress());
-            }
-
-
-            job.waitForCompletion(true);
+            /* Updating the progress in GUI */
+            this.updateProgress(job);
 
             /* Inserting results to the table */
             MainProgram.guiForm.insertResultsToTable(this.getResults());
@@ -108,10 +104,11 @@ public class MROperations implements Runnable {
     /* This methods creates a new thread to start and control the job to keep the GUI responsive */
     public void runHadoopJob(){
 
-        /*First reseting the progress bars */
+        /* Firstly reseting the progress bars */
         MainProgram.guiForm.setMapperProgress(0);
         MainProgram.guiForm.setReducerProgress(0);
 
+        /* Starting the job parallel to the main thread so that GUI can continue working */
         t = new Thread (this, "MapReduce Job");
         t.start ();
     }
@@ -145,5 +142,34 @@ public class MROperations implements Runnable {
 
         return jobResults;
     }
+
+    /* This method updates the progress of all map and reduce tasks in GUI */
+    private void updateProgress(Job job) throws IOException, InterruptedException {
+
+        JobStatus js;
+        float mapProgress;
+        float reduceProgress;
+
+        while (!job.isComplete()) {
+
+            js = job.getStatus();
+            mapProgress = js.getMapProgress();
+            reduceProgress = js.getReduceProgress();
+
+            if ( mapProgress != (float)1.0) //progress methodlarinda bug oldugu icin surekli erkenden 1 dondurebiliyor. Bu kontrol onun icin.
+                MainProgram.guiForm.setMapperProgress(job.getStatus().getMapProgress());
+
+            else if ( (reduceProgress != (float)0.0) && (reduceProgress != (float)1.0) ) { //Map tasklari bitmeden reduce taskları baslamiyor (Hadoop bu sekilde yapiyor normalde)
+                MainProgram.guiForm.setMapperProgress((float) 1.0); //Map task bittigi icin progress barda 100 set ediliyor burada.(Yukarıda kontrolden dolayi set edilemiyor cunku hic)
+                MainProgram.guiForm.setReducerProgress(job.getStatus().getReduceProgress());
+            }
+
+            Thread.sleep(500);
+        }
+
+        MainProgram.guiForm.setReducerProgress((float)1.0); //Reduce taski da bittigi icin 100 olarak burada set ediliyor.
+
+    }
+
 
 }

@@ -338,7 +338,7 @@ public class MainGUI extends JFrame {
     /* Sets mapper bar progress */
     public void setMapperProgress(float val) {
 
-        val *= 100;
+        val *= 100.0;
         mapperBar.setValue(Math.round(val));
 
     }
@@ -346,7 +346,7 @@ public class MainGUI extends JFrame {
     /* Sets reducer bar progress */
     public void setReducerProgress(float val) {
 
-        val *= 100;
+        val *= 100.0;
         reducerBar.setValue(Math.round(val));
 
     }
