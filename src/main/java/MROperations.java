@@ -12,6 +12,7 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobStatus;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -24,12 +25,13 @@ import org.apache.hadoop.io.SequenceFile.Reader.Option;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
 
-public class MROperations {
+public class MROperations implements Runnable {
 
     private Class<? extends Reducer> statisticalReducer;                    /* Statistical reducer class that is used in Reduce and Combine workers */
     FileSystem fs;                                                          /* Used for HDFS i/o */
     Configuration conf;                                                     /* Used for Hadoop worker configuration */
     public static HashSet<String> productCategories = new HashSet<>();      /* This hashset holds the detected product categories while mapping is done (see RatingMapper class) */
+    private Thread t;                                                       /* MapReduce job runs in a thread different than Main thread */
 
 
     /* Sets the statistical reducer class according to given parameter */
@@ -42,8 +44,6 @@ public class MROperations {
         conf = new Configuration();
         conf.set("fs.defaultFS", "hdfs://172.20.10.10:9000");
         conf.set("mapreduce.jobtracker.address", "172.20.10.10:54311");
-        //conf.set("mapreduce.map.class", "RatingMapper");
-        //conf.set("mapreduce.reduce.class", "StatisticalReducer.MeanReducer");
     }
 
     /* Creating a new job based on the configuration */
@@ -63,8 +63,8 @@ public class MROperations {
         return job;
     }
 
-    /* This methods runs the Hadoop job on top of the HDFS with specified statistic function for Combiner & Reducer */
-    public boolean runHadoopJob(){
+    /* This method runs the Hadoop job on top of the HDFS with specified statistic function for Combiner & Reducer */
+    public void run() {
         try{
             System.out.println("Starting to run the code on Hadoop...");
             String[] argsTemp = { "hdfs://172.20.10.10:9000/customerReview/input", "hdfs://172.20.10.10:9000/customerReview/output" };
@@ -88,17 +88,29 @@ public class MROperations {
 
             /* Running the job */
             job.submit();
-            job.waitForCompletion(true);
 
+            /* Updating the progress in GUI */
+            this.updateProgress(job);
 
-            System.out.println("Job Finished!");
+            /* Inserting results to the table */
+            MainProgram.guiForm.insertResultsToTable(this.getResults());
+
         } catch (Exception e) {
-            System.out.println("Job Failed!");
             System.out.println(e.getMessage());
-            return false;
         }
+    }
 
-        return true;
+
+    /* This methods creates a new thread to start and control the job to keep the GUI responsive */
+    public void runHadoopJob(){
+
+        /* Firstly reseting the progress bars */
+        MainProgram.guiForm.setMapperProgress(0);
+        MainProgram.guiForm.setReducerProgress(0);
+
+        /* Starting the job parallel to the main thread so that GUI can continue working */
+        t = new Thread (this, "MapReduce Job");
+        t.start ();
     }
 
     /* Returns the result of MapReduce job as hashmap of key-value pairs */
@@ -130,5 +142,34 @@ public class MROperations {
 
         return jobResults;
     }
+
+    /* This method updates the progress of all map and reduce tasks in GUI */
+    private void updateProgress(Job job) throws IOException, InterruptedException {
+
+        JobStatus js;
+        float mapProgress;
+        float reduceProgress;
+
+        while (!job.isComplete()) {
+
+            js = job.getStatus();
+            mapProgress = js.getMapProgress();
+            reduceProgress = js.getReduceProgress();
+
+            if ( mapProgress != (float)1.0) //progress methodlarinda bug oldugu icin surekli erkenden 1 dondurebiliyor. Bu kontrol onun icin.
+                MainProgram.guiForm.setMapperProgress(job.getStatus().getMapProgress());
+
+            else if ( (reduceProgress != (float)0.0) && (reduceProgress != (float)1.0) ) { //Map tasklari bitmeden reduce taskları baslamiyor (Hadoop bu sekilde yapiyor normalde)
+                MainProgram.guiForm.setMapperProgress((float) 1.0); //Map task bittigi icin progress barda 100 set ediliyor burada.(Yukarıda kontrolden dolayi set edilemiyor cunku hic)
+                MainProgram.guiForm.setReducerProgress(job.getStatus().getReduceProgress());
+            }
+
+            Thread.sleep(500);
+        }
+
+        MainProgram.guiForm.setReducerProgress((float)1.0); //Reduce taski da bittigi icin 100 olarak burada set ediliyor.
+
+    }
+
 
 }

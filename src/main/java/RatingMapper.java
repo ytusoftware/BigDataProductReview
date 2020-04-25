@@ -34,6 +34,9 @@ public class RatingMapper
 
             /* Adding the product category to the hashset */
             MROperations.productCategories.add(columns[6]);
+
+            /* Setting the current mapper's progress in GUI */
+            //MainProgram.guiForm.setMapperProgress(context.getProgress());
         }
         catch (Exception e) {
             System.out.println(e.getMessage());

@@ -29,6 +29,8 @@ public class MainGUI extends JFrame {
     private JButton deleteSelectedFileButton;
     private JButton downloadSelectedFileButton;
     private JButton addNewFileButton;
+    private JProgressBar mapperBar;
+    private JProgressBar reducerBar;
     private JLabel testLabel;
     private DefaultTableModel dtmMapReduce;
     private DefaultTableModel dtmHDFS;
@@ -97,15 +99,6 @@ public class MainGUI extends JFrame {
 
                 System.out.println("Total execution time in seconds: "+ elapsedTime/1000000000);
 
-
-                try {
-                    jobResults = mrOp.getResults();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-
-                /* Inserting results to the table */
-                insertResultsToTable(jobResults);
 
             }
         });
@@ -283,7 +276,7 @@ public class MainGUI extends JFrame {
     }
 
     /* Inserts MapReduce job results to the JTable component */
-    private void insertResultsToTable(HashMap<String,Double> jobResults) {
+    public void insertResultsToTable(HashMap<String,Double> jobResults) {
         int currRowIndex = 0;
 
         initResultTable(jobResults);
@@ -340,6 +333,22 @@ public class MainGUI extends JFrame {
 
             dtmHDFS.addRow(new Object[]{file.getPath().getName(),FileUtils.byteCountToDisplaySize(file.getLen()) , file.getReplication(), FileUtils.byteCountToDisplaySize(file.getBlockSize())});
         }
+    }
+
+    /* Sets mapper bar progress */
+    public void setMapperProgress(float val) {
+
+        val *= 100.0;
+        mapperBar.setValue(Math.round(val));
+
+    }
+
+    /* Sets reducer bar progress */
+    public void setReducerProgress(float val) {
+
+        val *= 100.0;
+        reducerBar.setValue(Math.round(val));
+
     }
 
 }
