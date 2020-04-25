@@ -21,7 +21,8 @@ public class HDFSOperations {
 
     public HDFSOperations() {
 
-        String nameNodeIp = "localhost"; //ONEMLI: Bunu kendi namenode ip adresin ile degistir Onur.
+        String nameNodeIp = "172.20.10.10"; //ONEMLI: Bunu kendi namenode ip adresin ile degistir Onur.
+        //String nameNodeIp = "localhost"; //ONEMLI: Bunu kendi namenode ip adresin ile degistir Onur.
 
         /* Creating the configuration instance */
         conf = new Configuration();
@@ -29,8 +30,8 @@ public class HDFSOperations {
         conf.set("mapreduce.jobtracker.address", nameNodeIp+":54311");
 
         /* Setting HDFS input directory path */
-        //inputDirectoryPath = "/customerReview/input";
-        inputDirectoryPath = "/bigDataProject";
+        inputDirectoryPath = "/customerReview/input";
+        //inputDirectoryPath = "/bigDataProject";
 
         try{
             /* Creating file system */

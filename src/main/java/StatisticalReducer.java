@@ -40,6 +40,9 @@ public class StatisticalReducer {
 
             result.set(sum/count);
             context.write(key, result);
+
+            /* Setting the current reducer's progress in GUI */
+            //MainProgram.guiForm.setReducerProgress(context.getProgress());
         }
     }
 
@@ -60,6 +63,9 @@ public class StatisticalReducer {
             }
             result.set(min);
             context.write(key, result);
+
+            /* Setting the current reducer's progress in GUI */
+            //MainProgram.guiForm.setReducerProgress(context.getProgress());
         }
     }
 
@@ -80,6 +86,9 @@ public class StatisticalReducer {
             }
             result.set(max);
             context.write(key, result);
+
+            /* Setting the current reducer's progress in GUI */
+            //MainProgram.guiForm.setReducerProgress(context.getProgress());
         }
     }
 
@@ -127,6 +136,9 @@ public class StatisticalReducer {
 
             result.set(stdDev);
             context.write(key, result);
+
+            /* Setting the current reducer's progress in GUI */
+            //MainProgram.guiForm.setReducerProgress(context.getProgress());
         }
     }
 
@@ -158,6 +170,9 @@ public class StatisticalReducer {
             }
             result.set(maxFreqIndex+1);
             context.write(key, result);
+
+            /* Setting the current reducer's progress in GUI */
+            //MainProgram.guiForm.setReducerProgress(context.getProgress());
         }
     }
 
@@ -175,6 +190,9 @@ public class StatisticalReducer {
             numVotes = StatisticalReducer.convertIteratorToList(values).size();
             result.set(numVotes);
             context.write(key, result);
+
+            /* Setting the current reducer's progress in GUI */
+            //MainProgram.guiForm.setReducerProgress(context.getProgress());
         }
     }
 

@@ -24,12 +24,13 @@ import org.apache.hadoop.io.SequenceFile.Reader.Option;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
 
-public class MROperations {
+public class MROperations implements Runnable {
 
     private Class<? extends Reducer> statisticalReducer;                    /* Statistical reducer class that is used in Reduce and Combine workers */
     FileSystem fs;                                                          /* Used for HDFS i/o */
     Configuration conf;                                                     /* Used for Hadoop worker configuration */
     public static HashSet<String> productCategories = new HashSet<>();      /* This hashset holds the detected product categories while mapping is done (see RatingMapper class) */
+    private Thread t;                                                       /* MapReduce job runs in a thread different than Main thread */
 
 
     /* Sets the statistical reducer class according to given parameter */
@@ -42,8 +43,6 @@ public class MROperations {
         conf = new Configuration();
         conf.set("fs.defaultFS", "hdfs://172.20.10.10:9000");
         conf.set("mapreduce.jobtracker.address", "172.20.10.10:54311");
-        //conf.set("mapreduce.map.class", "RatingMapper");
-        //conf.set("mapreduce.reduce.class", "StatisticalReducer.MeanReducer");
     }
 
     /* Creating a new job based on the configuration */
@@ -63,8 +62,8 @@ public class MROperations {
         return job;
     }
 
-    /* This methods runs the Hadoop job on top of the HDFS with specified statistic function for Combiner & Reducer */
-    public boolean runHadoopJob(){
+    /* This method runs the Hadoop job on top of the HDFS with specified statistic function for Combiner & Reducer */
+    public void run() {
         try{
             System.out.println("Starting to run the code on Hadoop...");
             String[] argsTemp = { "hdfs://172.20.10.10:9000/customerReview/input", "hdfs://172.20.10.10:9000/customerReview/output" };
@@ -88,17 +87,33 @@ public class MROperations {
 
             /* Running the job */
             job.submit();
+
+            while (!job.isComplete()) {
+                MainProgram.guiForm.setMapperProgress(job.getStatus().getMapProgress());
+                MainProgram.guiForm.setReducerProgress(job.getStatus().getReduceProgress());
+            }
+
+
             job.waitForCompletion(true);
 
+            /* Inserting results to the table */
+            MainProgram.guiForm.insertResultsToTable(this.getResults());
 
-            System.out.println("Job Finished!");
         } catch (Exception e) {
-            System.out.println("Job Failed!");
             System.out.println(e.getMessage());
-            return false;
         }
+    }
 
-        return true;
+
+    /* This methods creates a new thread to start and control the job to keep the GUI responsive */
+    public void runHadoopJob(){
+
+        /*First reseting the progress bars */
+        MainProgram.guiForm.setMapperProgress(0);
+        MainProgram.guiForm.setReducerProgress(0);
+
+        t = new Thread (this, "MapReduce Job");
+        t.start ();
     }
 
     /* Returns the result of MapReduce job as hashmap of key-value pairs */
