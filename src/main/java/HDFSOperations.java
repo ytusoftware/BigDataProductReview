@@ -13,16 +13,21 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+enum RETURN_VAL{
+    PATH_EXIST, FILE_EXIST, PATH_INVALID, NO_ERROR;
+}
+
 public class HDFSOperations {
 
     private Configuration conf;             /* Used for Hadoop worker configuration */
-    private String inputDirectoryPath;      /* The Amazon Dataset is in that directory */
+    //private String inputDirectoryPath;      /* The Amazon Dataset is in that directory */
+    private Path currentPath;               /* Current directory path information is kept. */
     private FileSystem fs;
 
     public HDFSOperations() {
 
-        String nameNodeIp = "172.20.10.10"; //ONEMLI: Bunu kendi namenode ip adresin ile degistir Onur.
-        //String nameNodeIp = "localhost"; //ONEMLI: Bunu kendi namenode ip adresin ile degistir Onur.
+        //String nameNodeIp = "172.20.10.10"; //ONEMLI: Bunu kendi namenode ip adresin ile degistir Onur.
+        String nameNodeIp = "localhost"; //ONEMLI: Bunu kendi namenode ip adresin ile degistir Onur.
 
         /* Creating the configuration instance */
         conf = new Configuration();
@@ -30,12 +35,12 @@ public class HDFSOperations {
         conf.set("mapreduce.jobtracker.address", nameNodeIp+":54311");
 
         /* Setting HDFS input directory path */
-        inputDirectoryPath = "/customerReview/input";
-        //inputDirectoryPath = "/bigDataProject";
+        //inputDirectoryPath = "/customerReview/input";
+        currentPath = new Path("/");
 
         try{
             /* Creating file system */
-            fs = FileSystem.get(URI.create(inputDirectoryPath), conf);
+            fs = FileSystem.get(conf);
         }
         catch (IOException ex){
             ex.printStackTrace();
@@ -43,11 +48,19 @@ public class HDFSOperations {
 
     }
 
+    public Path getCurrentPath() {
+        return currentPath;
+    }
+
+    public void setCurrentPath(Path currentPath) {
+        this.currentPath = currentPath;
+    }
+
     /* Gets the files in the HDFS input directory */
     public FileStatus[] getHDFSContent() throws IOException {
 
         /* Getting the status of the files in file system */
-        FileStatus[] files = fs.listStatus(new Path(inputDirectoryPath));
+        FileStatus[] files = fs.listStatus(currentPath);
 
         return files;
     }
@@ -99,7 +112,7 @@ public class HDFSOperations {
             localPath = fileToSave.getAbsolutePath();
 
             /* The file is copied from the user's computer to the filesystem. */
-            fs.copyFromLocalFile(new Path(localPath), new Path(inputDirectoryPath));
+            fs.copyFromLocalFile(new Path(localPath), currentPath);
         }
         else{
             System.out.println("The file upload operation was cancelled. ");
@@ -112,5 +125,88 @@ public class HDFSOperations {
         /* The file on the path is deleted from the file system. */
         fs.delete(filePath, true);
     }
+
+    /* The current directory of the file system is being changed. */
+    public boolean goDirectory(Path destinationPath){
+
+        /* If the isDir is true, destinationPath is a directory, otherwise it is not a directory. */
+        boolean isDir = false;
+        FileStatus fileStatus;
+
+        try{
+            isDir = fs.exists(destinationPath);
+
+            /* Checking if path is valid. */
+            if ( true == isDir ) {
+
+                fileStatus = fs.getFileStatus(destinationPath);
+                isDir = fileStatus.isDirectory();
+
+                /* If the destination path is directory, the current system of the file system is changed. */
+                if (true == isDir) {
+
+                    currentPath = destinationPath;
+                }
+            }
+
+        }
+        catch (IOException ex){
+            ex.printStackTrace();
+        }
+
+        return isDir;
+    }
+
+    /* The new directory entered by the user is created in the file-system. */
+    public RETURN_VAL createDirectory(String newDirectory ){
+
+        String newPath;
+        boolean isPathExist;
+        boolean isCreateDirectory;
+        RETURN_VAL retVal = RETURN_VAL.NO_ERROR;
+
+        /* The current directory and the directory you want to create new are combined. */
+        if ( 0 == currentPath.toString().compareTo("/") ){
+            newPath = currentPath.toString() + newDirectory;
+        }
+        else {
+            newPath = currentPath.toString() + "/" + newDirectory;
+        }
+
+        /* Checking if the same directory exists. */
+        try{
+            isPathExist = fs.exists(new Path(newPath));
+
+            if ( isPathExist ){
+                retVal = RETURN_VAL.PATH_EXIST;
+            }
+
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            retVal = RETURN_VAL.PATH_INVALID;
+        }
+
+        /* Creating new directory. */
+        try{
+
+            if ( retVal == RETURN_VAL.NO_ERROR ){
+                isCreateDirectory = fs.mkdirs(new Path(newPath));
+                if ( !isCreateDirectory )
+                {
+                    retVal = RETURN_VAL.PATH_INVALID;
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            retVal = RETURN_VAL.PATH_INVALID;
+            ex.printStackTrace();
+        }
+
+        return retVal;
+    }
+
 
 }

@@ -1,16 +1,21 @@
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.Path;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Vector;
 
 public class MainGUI extends JFrame {
     private JPanel rootPanel;
@@ -25,12 +30,14 @@ public class MainGUI extends JFrame {
     private JPanel HDFSSec;
     private JPanel MapReduceSec;
     private JTable table2;
-    private JButton listHDFSContentButton;
+    private JButton createDirectoryButton;
     private JButton deleteSelectedFileButton;
     private JButton downloadSelectedFileButton;
     private JButton addNewFileButton;
     private JProgressBar mapperBar;
     private JProgressBar reducerBar;
+    private JTextField directoryPath;
+    private JButton goButton;
     private JLabel testLabel;
     private DefaultTableModel dtmMapReduce;
     private DefaultTableModel dtmHDFS;
@@ -47,13 +54,9 @@ public class MainGUI extends JFrame {
 
         /* The file system is initializing. */
         hdfsOp = new HDFSOperations();
-        try {
-            /* Files in the file system are listed. */
-            listFileStatus();
-        }
-        catch (IOException ex){
-            ex.printStackTrace();
-        }
+        /* Files in the file system are listed. */
+        listFileStatus();
+
 
         button1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -123,16 +126,56 @@ public class MainGUI extends JFrame {
                 productCategoryFilter(pattern);
             }
         });
-        listHDFSContentButton.addActionListener(new ActionListener() {
+        goButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                try {
-                    /* Files in the file system are listed. */
-                    listFileStatus();
+                /* Getting path information that the user wants to go to. */
+                String path = directoryPath.getText();
 
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+                /* Go to entered path */
+                boolean isChangedDirectory =  hdfsOp.goDirectory(new Path(path));
+
+                /* If the directory has changed, list the files in the new directory */
+                if ( isChangedDirectory == true ){
+                    listFileStatus();
+                }
+                else {
+                    /* If directory is invalid, the user is informed with a warning message. */
+                    JOptionPane.showMessageDialog(table2,"The directory is invalid!","Warning",JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+
+        createDirectoryButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                String newDirectory = JOptionPane.showInputDialog(
+                        table2,
+                        "Enter the New Directory Name",
+                        "Create Diretory",
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+                if ( null != newDirectory ){
+                    /* Creating a new directory entered by the user. */
+                    RETURN_VAL retCreateDirectory = hdfsOp.createDirectory(newDirectory);
+
+                    /* If the creation was not successful, the user is informed. */
+                    if ( retCreateDirectory == RETURN_VAL.PATH_EXIST ){
+                        /* If new directory is exist, the user is informed with a warning message. */
+                        JOptionPane.showMessageDialog(table2,"The new directory is exist in filesystem!","Warning",JOptionPane.WARNING_MESSAGE);
+                    }
+                    else if ( retCreateDirectory == RETURN_VAL.PATH_INVALID  ){
+                        /* If path is invalid, the user is informed with a warning message. */
+                        JOptionPane.showMessageDialog(table2,"New directory name is invalid! Please enter without '/' at the beginning of the name. ","Warning",JOptionPane.WARNING_MESSAGE);
+                    }
+                    else{
+                        /* List the files in the current directory */
+                        listFileStatus();
+                    }
+
                 }
 
             }
@@ -147,7 +190,9 @@ public class MainGUI extends JFrame {
                 /* It is determined which line is selected. */
                 row = table2.getSelectedRow();
 
-                if ( row >= 0 ) {
+                if ( row >= 0 && files[row].isFile()) {
+
+                    /* Getting the file to be deleted. */
                     file = files[row];
 
                     try{
@@ -167,6 +212,21 @@ public class MainGUI extends JFrame {
                 }
             }
         });
+//        backButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//
+//                /* Getting a parent directory information. */
+//                Path parentPath = hdfsOp.getCurrentPath().getParent();
+//                /* Going to the parent directory. */
+//                boolean retVal = hdfsOp.goDirectory(parentPath);
+//
+//                /* If the process is successful, the files are listed. */
+//                listFileStatus();
+//
+//            }
+//        });
+
         downloadSelectedFileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -213,6 +273,42 @@ public class MainGUI extends JFrame {
                     ex.printStackTrace();
                 }
 
+            }
+        });
+
+
+        table2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                /* If it's clicked, the information of the clicked row is getting. */
+                if ( table2.getSelectedRow() != -1 )
+                {
+                    int row = table2.getSelectedRow();
+                    FileStatus file = files[row];
+
+                    /* Checking the file or directory of the line clicked. */
+                    if ( file.isDirectory() ){
+
+                        String newPath;
+
+                        /* The current directory and the directory you want to create new are combined. */
+                        if ( 0 == hdfsOp.getCurrentPath().toString().compareTo("/") ){
+                            newPath = hdfsOp.getCurrentPath().toString() + file.getPath().getName();
+                        }
+                        else {
+                            newPath = hdfsOp.getCurrentPath().toString() + "/" + file.getPath().getName();
+                        }
+
+                        /* If it is a directory, go to the relevant directory. */
+                        boolean retVal = hdfsOp.goDirectory(new Path(newPath));
+
+                        /* If the process is successful, list the files */
+                        if ( retVal == true )
+                            listFileStatus();
+                    }
+
+                }
             }
         });
     }
@@ -321,18 +417,27 @@ public class MainGUI extends JFrame {
 
     }
 
-    private void listFileStatus() throws IOException{
+    private void listFileStatus(){
 
-        /* Getting the status of the files in dataset directory */
-        files = hdfsOp.getHDFSContent();
+        try {
+            /* Getting the status of the files in dataset directory */
+            files = hdfsOp.getHDFSContent();
 
-        dtmHDFS.setRowCount(0);
+            dtmHDFS.setRowCount(0);
 
-        /* Adding the files as the rows of the HDFS jTable */
-        for(FileStatus file:files) {
+            /* Adding the files as the rows of the HDFS jTable */
+            for(FileStatus file:files) {
+                dtmHDFS.addRow(new Object[]{file.getPath().getName(),FileUtils.byteCountToDisplaySize(file.getLen()) , file.getReplication(), FileUtils.byteCountToDisplaySize(file.getBlockSize())});
+            }
 
-            dtmHDFS.addRow(new Object[]{file.getPath().getName(),FileUtils.byteCountToDisplaySize(file.getLen()) , file.getReplication(), FileUtils.byteCountToDisplaySize(file.getBlockSize())});
+            directoryPath.setText(hdfsOp.getCurrentPath().toString());
+
         }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
+
     }
 
     /* Sets mapper bar progress */
