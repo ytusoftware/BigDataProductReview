@@ -38,6 +38,7 @@ public class MainGUI extends JFrame {
     private JProgressBar reducerBar;
     private JTextField directoryPath;
     private JButton goButton;
+    private JButton backButton;
     private JLabel testLabel;
     private DefaultTableModel dtmMapReduce;
     private DefaultTableModel dtmHDFS;
@@ -212,20 +213,20 @@ public class MainGUI extends JFrame {
                 }
             }
         });
-//        backButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//
-//                /* Getting a parent directory information. */
-//                Path parentPath = hdfsOp.getCurrentPath().getParent();
-//                /* Going to the parent directory. */
-//                boolean retVal = hdfsOp.goDirectory(parentPath);
-//
-//                /* If the process is successful, the files are listed. */
-//                listFileStatus();
-//
-//            }
-//        });
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                /* Getting a parent directory information. */
+                Path parentPath = hdfsOp.getCurrentPath().getParent();
+                /* Going to the parent directory. */
+                boolean retVal = hdfsOp.goDirectory(parentPath);
+
+                /* If the process is successful, the files are listed. */
+                listFileStatus();
+
+            }
+        });
 
         downloadSelectedFileButton.addActionListener(new ActionListener() {
             @Override

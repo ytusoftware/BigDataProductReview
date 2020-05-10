@@ -27,7 +27,7 @@ public class HDFSOperations {
 
     public HDFSOperations() {
 
-        String nameNodeIp = "localhost"; //ONEMLI: Bunu kendi namenode ip adresin ile degistir Onur.
+        String nameNodeIp = "172.20.10.10"; //ONEMLI: Bunu kendi namenode ip adresin ile degistir Onur.
         try{
             InetAddress inetAddress = InetAddress.getLocalHost();
             nameNodeIp = inetAddress.getHostAddress();
