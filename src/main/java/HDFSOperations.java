@@ -11,6 +11,7 @@ import org.apache.hadoop.fs.Path;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
 
 enum RETURN_VAL{
@@ -26,8 +27,14 @@ public class HDFSOperations {
 
     public HDFSOperations() {
 
-        //String nameNodeIp = "172.20.10.10"; //ONEMLI: Bunu kendi namenode ip adresin ile degistir Onur.
         String nameNodeIp = "localhost"; //ONEMLI: Bunu kendi namenode ip adresin ile degistir Onur.
+        try{
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            nameNodeIp = inetAddress.getHostAddress();
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
 
         /* Creating the configuration instance */
         conf = new Configuration();

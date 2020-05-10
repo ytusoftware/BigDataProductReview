@@ -2,28 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="eb3747b5-49b0-464c-a31b-d438febd48cd" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/folderIcon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/GUIDesigner.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/GUIDesigner.form" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/HDFSOperations.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/HDFSOperations.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/MainGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/MainGUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/HDFSOperations.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/HDFSOperations.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MROperations.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MROperations.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MainGUI$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainGUI$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MainGUI$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainGUI$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MainGUI$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainGUI$3.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MainGUI$4.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainGUI$4.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MainGUI$5.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainGUI$5.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MainGUI$6.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainGUI$6.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MainGUI$7.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainGUI$7.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MainGUI.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/MainGUI.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/RatingMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/RatingMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/StatisticalReducer$MaxReducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/StatisticalReducer$MaxReducer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/StatisticalReducer$MinReducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/StatisticalReducer$MinReducer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/StatisticalReducer$ModeReducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/StatisticalReducer$ModeReducer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/StatisticalReducer$StdDevReducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/StatisticalReducer$StdDevReducer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/StatisticalReducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/StatisticalReducer.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,7 +109,7 @@
       <workItem from="1589043621011" duration="669000" />
       <workItem from="1589123606094" duration="1624000" />
       <workItem from="1589125623003" duration="1679000" />
-      <workItem from="1589127439905" duration="1070000" />
+      <workItem from="1589127439905" duration="1365000" />
     </task>
     <servers />
   </component>
