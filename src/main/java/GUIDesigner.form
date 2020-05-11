@@ -90,25 +90,45 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="c30b0" class="javax.swing.JTextField" binding="directoryPath">
+                  <grid id="a063f" layout-manager="BorderLayout" hgap="0" vgap="0">
                     <constraints border-constraint="Center"/>
-                    <properties>
-                      <text value="/"/>
-                    </properties>
-                  </component>
-                  <component id="6d343" class="javax.swing.JButton" binding="goButton">
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="c30b0" class="javax.swing.JTextField" binding="directoryPath">
+                        <constraints border-constraint="Center"/>
+                        <properties>
+                          <text value="/"/>
+                        </properties>
+                      </component>
+                      <component id="90888" class="javax.swing.JLabel">
+                        <constraints border-constraint="West"/>
+                        <properties>
+                          <requestFocusEnabled value="false"/>
+                          <text value="Directory:"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="21e0b" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
                     <constraints border-constraint="East"/>
-                    <properties>
-                      <text value="Go!"/>
-                    </properties>
-                  </component>
-                  <component id="90888" class="javax.swing.JLabel">
-                    <constraints border-constraint="West"/>
-                    <properties>
-                      <requestFocusEnabled value="false"/>
-                      <text value="Directory:"/>
-                    </properties>
-                  </component>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="6d343" class="javax.swing.JButton" binding="goButton">
+                        <constraints/>
+                        <properties>
+                          <text value="Go!"/>
+                        </properties>
+                      </component>
+                      <component id="7766d" class="javax.swing.JButton" binding="backButton">
+                        <constraints/>
+                        <properties>
+                          <text value="Back"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
                 </children>
               </grid>
             </children>
@@ -243,7 +263,7 @@
                         <properties/>
                         <border type="none"/>
                         <children>
-                          <grid id="39132" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+                          <grid id="39132" layout-manager="FlowLayout" hgap="25" vgap="5" flow-align="1">
                             <constraints>
                               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                             </constraints>
@@ -274,12 +294,40 @@
                               <component id="31b2e" class="javax.swing.JLabel">
                                 <constraints/>
                                 <properties>
+                                  <horizontalAlignment value="10"/>
+                                  <horizontalTextPosition value="11"/>
                                   <text value="Map Progress:"/>
                                 </properties>
                               </component>
+                              <hspacer id="a9b55">
+                                <constraints/>
+                              </hspacer>
+                              <hspacer id="28f6c">
+                                <constraints/>
+                              </hspacer>
+                              <hspacer id="86032">
+                                <constraints/>
+                              </hspacer>
+                              <hspacer id="e4912">
+                                <constraints/>
+                              </hspacer>
+                              <hspacer id="cb0c1">
+                                <constraints/>
+                              </hspacer>
+                              <hspacer id="7046e">
+                                <constraints/>
+                              </hspacer>
+                              <hspacer id="900c3">
+                                <constraints/>
+                              </hspacer>
+                              <hspacer id="3b861">
+                                <constraints/>
+                              </hspacer>
                               <component id="660eb" class="javax.swing.JProgressBar" binding="mapperBar">
                                 <constraints/>
                                 <properties>
+                                  <alignmentX value="0.5"/>
+                                  <focusable value="true"/>
                                   <stringPainted value="true"/>
                                 </properties>
                               </component>
